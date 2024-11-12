@@ -1,336 +1,294 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Online TV</h1>
+    </div> 
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online TV.</title>
+    <title>Ovaga-Tv</title>
+    <meta name="description" content="ENJOY FREE LIVE IPTV">
+    <meta name="keywords" content="Watch live sports streaming online, including football, basketball, baseball, hockey, and more. Stream your favorite sports teams and events in HD, with no cable subscription required.">
+    <meta name="author" content="SUMON RANA">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="shortcut icon" type="image/x-icon" href="https://i.ibb.co.com/XpXz3b1/Picsart-24-10-15-01-07-11-687.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.6.2/dist/plyr.css" />
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.6.12/dist/plyr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.1.4/dist/hls.min.js"></script>
+<link rel="me" href="https://t.me/bdix_hub" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+</head>
+
+<body>
+    <!-- Custom Text Section -->
+    <div class="custom-text">
+       <header> 
+          </div>
+   
+
+    <!-- Video Player Section -->
+    <div class="video-player">
+        
+        <div id="videoLoading" class="loading">
+            <p>Loading video...</p>
+        </div>
+        <video id="videoPlayer" controls crossorigin playsinline unmuted autoplay>
+            <source id="videoSource" type="application/vnd.apple.mpegurl" src="">
+        </video>
+    </div>
+    <div class="col-md-12">
+
+    </div>
+    
+        <div id="channelLoading" class="loading">
+            <p>Loading channels...</p>
+        </div>
+        <div class="channel-buttons" id="channelList" style="display: none;">
+            <!-- Channels will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const videoLoading = document.getElementById('videoLoading');
+        const channelLoading = document.getElementById('channelLoading');
+        const channelList = document.getElementById('channelList');
+
+        // Display video loading animation
+        video.addEventListener('waiting', function () {
+            videoLoading.style.display = 'block';
+        });
+
+        video.addEventListener('playing', function () {
+            videoLoading.style.display = 'none';
+        });
+
+        // Load demo video when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            const demoVideoUrl = 'https://cdn2.pishow.tv/live/135/master.m3u8';
+            loadVideo(demoVideoUrl);
+
+            // Fetch and load channels
+            loadChannels();
+        });
+
+        function loadVideo(sourceUrl) {
+            if (Hls.isSupported()) {
+                if (window.hls) {
+                    window.hls.destroy();
+                }
+                var hls = new Hls();
+                hls.loadSource(sourceUrl);
+                hls.attachMedia(video);
+                window.hls = hls;
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = sourceUrl;
+            }
+            video.play();
+        }
+
+        function loadChannels() {
+            // Simulate delay for loading channels
+            setTimeout(() => {
+                fetch('https://raw.githubusercontent.com/Mahabubur0168/Freetv/main/mahabuburnew.m3u)
+                    .then(response => response.text())
+                    .then(data => {
+                        const lines = data.split('\n');
+                        let channels = [];
+                        let currentChannel = {};
+
+                        lines.forEach(line => {
+                            if (line.startsWith('#EXTINF')) {
+                                const logoMatch = line.match(/tvg-logo="(.*?)"/);
+                                const nameMatch = line.match(/,(.*)/);
+                                if (logoMatch && nameMatch) {
+                                    currentChannel.logo = logoMatch[1];
+                                    currentChannel.name = nameMatch[1];
+                                }
+                            } else if (line.startsWith('http')) {
+                                currentChannel.url = line.trim();
+                                channels.push(currentChannel);
+                                currentChannel = {};
+                            }
+                        });
+
+                        channels.forEach(channel => {
+                            const channelButton = document.createElement('a');
+                            channelButton.href = "#";
+                            channelButton.classList.add('channel-link');
+                            channelButton.setAttribute('data-link', channel.url);
+
+                            const logoImg = document.createElement('img');
+                            logoImg.src = channel.logo;
+                            logoImg.alt = channel.name + ' Logo';
+
+                            channelButton.appendChild(logoImg);
+                            channelList.appendChild(channelButton);
+                        });
+
+                        // Display channels after loading
+                        channelLoading.style.display = 'none';
+                        channelList.style.display = 'flex';
+
+                        // Add event listeners to channel links
+                        document.querySelectorAll('.channel-link').forEach(function (link) {
+                            link.addEventListener('click', function (event) {
+                                event.preventDefault();
+                                const newSource = this.getAttribute('data-link');
+                                loadVideo(newSource);
+                            });
+                        });
+                    });
+            }, 2000); // Simulating a delay for demonstration
+        }
+    </script>
 
     <style>
-        /* Base styles */
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            /* Set column direction for body */
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background-color: #181818;
+            color: #fff;
             margin: 0;
-            background-color: black;
-
-        }
-
-        .hr {
-            width: 20%;
-        }
-
-        .tv-container {
-            display: flex;
-            width: 90%;
-            height: 80%;
-            max-width: 1200px;
-            flex-direction: column;
-            opacity: 0;
-            /* Initially hidden */
-            transition: opacity 1s;
-            /* Fade-in effect */
-        }
-
-        @keyframes bounce {
-            0% {
-                transform: translateY(0);
-            }
-
-            100% {
-                transform: translateY(-20px);
-            }
-        }
-
-        /* Responsive channel list with more columns */
-        .channel-list {
-            width: 100%;
-            background: #010101de;
-            color: white;
-            padding: 25px;
-            display: grid;
-            grid-gap: 10px;
-            box-sizing: border-box;
-            border-radius: 50px;
-            overflow-y: auto;
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            /* Dynamic columns based on screen size */
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        }
-
-        .channel-item {
-            background: white;
-            border-radius: 12px;
-            padding: 10px;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.3s;
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            justify-content: center;
         }
 
-        .channel-item img {
-            width: 50px;
-            height: 50px;
-
-        }
-
-        .channel-item span {
-            font-size: 0px;
-            color: transparent;
+        /* Custom Text Styling */
+        .custom-text {
+            margin-top: 20px;
             text-align: center;
         }
 
-        .channel-item:hover {
-            transform: translateY(-5px);
-            border: 3px solid #009671f6;
-            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        }
-
-        .player {
-            width: 100%;
-
-            background: transparent;
+        .custom-text h1 {
+            font-size: 2rem;
+            color: #4CAF50;
+            background-color: #222;
             padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-            flex-grow: 1;
-            margin-bottom: 20px;
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
-        /* Clappr player will be styled dynamically */
-        #player {
-            width: 100%;
-            height: 40%;
-        }
-
-        /* Responsive styles */
-        @media (min-width: 768px) {
-            .tv-container {
-                flex-direction: row;
-            }
-
-            .channel-list {
-                max-width: 100%;
-                width: 100%;
-                border-radius: 10px;
-            }
-
-            .player {
-                width: 70%;
-                border-radius: 20px;
-                margin-right: 20px;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .tv-container {
-                flex-direction: column;
-            }
-
-            .player {
-                border-radius: 20px;
-            }
-
-            .channel-list {
-                max-height: 55%;
-                width: 400px;
-
-                margin-top: 8px;
-                border-radius: 5px;
-            }
-
-            .channel-item img {
-                width: 68px;
-                height: 68px;
-            }
-        }
-    </style>
-
-    </script>
-    <style>
-        #popup {
-            position: fixed;
-            top: 50%;
-            right: -200px;
-            /* Start off-screen */
-            width: 200px;
-            height: 200px;
-            background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjCvgaskwSgwXkklHj2fErU7kdgbF7R9xhdbpERgczwzWq_9FCOJO4j162TjS1sKBx0JyZQDMtPPFiv59OxKfsexE4cYamjk7LubiSJuN5lw2H4o0EKmHTmtpWRo_CRxXLBNwyU-vNDLlSrdnRMrG4yoay5R8qWXNlOZKa-pnlqxhfPKsEEuXorjVfMSg/s1028/transparent-Lumii_20240714_165233715.png') no-repeat center center;
-            background-size: cover;
-            transition: right 1s ease-in-out;
-        }
-    </style>
-    <style>
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        #blockMessage {
-            display: none;
-            width: 320px;
+        .video-player {
             padding: 20px;
-            background-color: #333;
-            color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            border-radius: 15px;
+            margin: 20px 0;
+            background-color: #1a1a1a;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        #blockMessage.show {
+        .video-player h2 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .video-player video {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #4CAF50;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading {
+            font-size: 18px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
             display: block;
-            animation: slideIn 0.5s forwards;
+            text-align: center;
         }
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #ff5c5c;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 4px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+        .channel-list {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
         }
 
-        .close-btn:hover {
-            background-color: #ff7878;
-            transform: scale(1.1);
+        .channel-list h2 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .channel-buttons {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .channel-buttons a {
+            background-color: #333;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .channel-buttons a img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .channel-buttons a:hover {
+            background-color: #4CAF50;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .video-player,
+            .channel-list {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .channel-buttons a {
+                width: 80px;
+                height: 80px;
+            }
+
+            .channel-buttons a img {
+                width: 60px;
+                height: 60px;
+            }
         }
     </style>
-
-
-<body>
-
-
-    <div id="player"></div>
-
-
-
-
-    <script>
-        window.onload = function () {
-            var blockMessage = document.getElementById('blockMessage');
-            blockMessage.classList.add('show');
-        };
-
-        function closeMessage() {
-            var blockMessage = document.getElementById('blockMessage');
-            blockMessage.style.display = 'none';
-        }
-    </script>
-
-
-    <div class="channel-list" id="channel-list"> </div>
-    </div>
-
-
-    <!-- Clappr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-
-    <script>
-        // Function to parse the playlist
-        function parseM3U8(playlist) {
-            const lines = playlist.split('\n');
-            let channels = [];
-            let currentChannel = {};
-
-            lines.forEach(line => {
-                if (line.startsWith('#EXTINF')) {
-                    const name = line.split(',')[1];
-                    const logoMatch = line.match(/tvg-logo="(.+?)"/);
-                    const logo = logoMatch ? logoMatch[1] : '';
-                    currentChannel = { name, logo };
-                } else if (line.startsWith('http')) {
-                    currentChannel.url = line.trim();
-                    channels.push(currentChannel);
-                    currentChannel = {};
-                }
-            });
-
-            return channels;
-        }
-
-        // Function to render the channel list
-        function renderChannelList(channels) {
-            const channelList = document.getElementById('channel-list');
-            channels.forEach((channel) => {
-                const channelItem = document.createElement('div');
-                channelItem.classList.add('channel-item');
-                channelItem.innerHTML = `
-                    <img src="${channel.logo}" alt="${channel.name}">
-                    
-                `;
-                channelItem.addEventListener('click', () => playChannel(channel.url));
-                channelList.appendChild(channelItem);
-            });
-
-            // Show content and hide loader after rendering
-            document.querySelector('.tv-container').style.opacity = 1; // Fade in the content
-            document.querySelector('.loader').style.display = 'none'; // Hide the loader
-        }
-
-        // Initialize Clappr player with default stream
-        let player = new Clappr.Player({
-            parentId: '#player',
-            source: 'https://files.catbox.moe/e1bw7h.mp4', // Set default stream
-            width: '100%',
-            height: '100%',
-            autoPlay: true,
-            mute: false,
-
-        });
-
-        // Function to play the selected channel
-        function playChannel(url) {
-            player.load(url);
-            player.play();
-        }
-
-        // Fetch the playlist from the external file
-        fetch('https://raw.githubusercontent.com/Mahabubur0168/Freetv/main/mahabuburnew.m3u')
-            .then(response => response.text())
-            .then(playlist => {
-                const channels = parseM3U8(playlist);
-                renderChannelList(channels);
-            })
-            .catch(error => console.error('Error fetching the playlist:', error));
-    </script>
-    <script>
-        window.onload = function () {
-            const popup = document.getElementById('popup');
-            popup.style.right = '50%'; // Move to the center
-            setTimeout(() => {
-                popup.style.right = '-200px'; // Move off-screen again
-            }, 3000); // Wait for 3 second
-        };
-    </script>
-
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2024 OVAGA-TV. All rights reserved.</p>
+        <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+  </div>
+    
 </body>
 
 </html>
